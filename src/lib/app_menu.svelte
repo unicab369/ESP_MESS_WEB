@@ -1,29 +1,15 @@
 <script lang="ts">
     import '@picocss/pico';
-    import menuIcon from '../assets/icons/menu-icon.svg'
-    import userIcon from '../assets/icons/user-icon.svg'
     import { goto } from '$app/navigation'
-
-    let isModalOpen = false
+    
     let isMenuOpen = false
 
     export function toggleMenu(event: any) { 
-        let target = (event as PointerEvent).target as any
+        let target = (event as PointerEvent)?.target as any
         isMenuOpen = !isMenuOpen // Toggle the modal state
 
-        if (target.innerText == 'Link1') {
+        if (target?.innerText == 'Link1') {
             goto('/app_map')
-        }
-    }
-
-    function toggleModal(event: any) {
-        let target = (event as PointerEvent).target as any
-        isModalOpen = !isModalOpen; // Toggle the modal state
-
-        console.log("IM HERE111")
-
-        if (target.id == 'confirm-button') {
-            console.log("IM HERE")
         }
     }
 </script>

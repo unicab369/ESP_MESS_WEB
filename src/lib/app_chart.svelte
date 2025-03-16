@@ -10,7 +10,7 @@
     let chart: uPlot;
 
     // Initialize circular buffers for X and Y data
-    const bufferSize = 20;
+    const bufferSize = 50;
     const initialXValues = Array.from({ length: bufferSize }, (_, i) => i + 1);
     const initialY1Values = Array.from({ length: bufferSize }, () => Math.floor(Math.random() * 100));
     const initialY2Values = Array.from({ length: bufferSize }, () => Math.floor(Math.random() * 100));
@@ -18,38 +18,6 @@
     let xBuffer = new CircularBuffer(bufferSize, initialXValues);
     let y1Buffer = new CircularBuffer(bufferSize, initialY1Values);
     let y2Buffer = new CircularBuffer(bufferSize, initialY2Values);
-
-    // Chart options
-    const options = {
-        title: title,
-        width: 600,
-        height: 400,
-        axes: [
-            {
-                stroke: '#63739c',
-                grid: {
-                    stroke: '#63739c'
-                },
-                ticks: {
-                    stroke: '#63739c'
-                }
-            },
-            {
-                stroke: '#63739c',
-                grid: {
-                    stroke: '#63739c',
-                },
-                ticks: {
-                    stroke: '#63739c',
-                },
-            }
-        ],
-        series: [
-            { label: 'X Axis' }, // X-axis
-            { label: 'Series 1', stroke: 'red' }, // Series 1
-            { label: 'Series 2', stroke: 'blue' }, // Series 2
-        ],
-    };
 
     // Function to generate a new random data point
     const generateRandomPoint = () => Math.floor(Math.random() * 100);
@@ -65,27 +33,60 @@
         y2Buffer.push(generateRandomPoint());
 
         // Update the chart data
-        if (chart) {
-            chart.setData([
-                xBuffer.toArray(),
-                y1Buffer.toArray(),
-                y2Buffer.toArray(),
-            ]);
-        }
+        chart?.setData([
+            xBuffer.toArray(),
+            y1Buffer.toArray(),
+            y2Buffer.toArray(),
+        ]);
     };
 
     // Initialize the chart when the component mounts
     onMount(() => {
+            // Chart options
+        const options = {
+            title: title,
+            width: 600,
+            height: 400,
+            axes: [
+                {
+                    stroke: '#63739c',
+                    grid: {
+                        stroke: '#63739c'
+                    },
+                    ticks: {
+                        stroke: '#63739c'
+                    }
+                },
+                {
+                    stroke: '#63739c',
+                    grid: {
+                        stroke: '#63739c',
+                    },
+                    ticks: {
+                        stroke: '#63739c',
+                    },
+                }
+            ],
+            series: [
+                { label: 'X Axis' }, // X-axis
+                { label: 'Series 1', stroke: 'red' }, // Series 1
+                { label: 'Series 2', stroke: 'blue' }, // Series 2
+            ],
+        };
+
         const initChart = () => {
             if (chartContainer) {
                 const containerWidth = chartContainer.offsetWidth;
                 options.width = containerWidth; // Set width dynamically
 
-                if (chart) {
-                    chart.destroy(); // Destroy existing chart if it exists
-                }
+                chart?.destroy(); // Destroy existing chart if it exists
+                chart = new uPlot(options, [
+                    xBuffer.toArray(),
+                    y1Buffer.toArray(),
+                    y2Buffer.toArray(),
+                ], chartContainer);
 
-                chart = new uPlot(options, [], chartContainer);
+                updateData();
             }
         };
 
@@ -99,12 +100,12 @@
         // Update chart data every second
         const interval = setInterval(() => {
             updateData()
-        }, 600);
+        }, 150);
 
         // Clean up the chart and interval when the component is destroyed
         return () => {
             clearInterval(interval);
-            chart.destroy();
+            chart?.destroy();
         };
     });
 </script>

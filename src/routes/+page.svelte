@@ -19,35 +19,51 @@
 
     let isConnected = false; // Tracks connection status
 
-        // Initialize WebSocket connection
-    function connectWebSocket() {
-        webSocket = new WebSocket('ws://10.0.0.233:3333');
+    let vModel:any = {
+        title: 'ESP-MESS V2.0',
+        leftButton: {
+            icon: menuIcon,
+            action: ()=> {
+                drawer_menu?.toggleMenu(null)
+            }
+        },
+        rightButton: {
+            icon: userIcon,
+            action: ()=> {
 
-        webSocket.onopen = () => {
-            console.log('WebSocket connection established');
-            isConnected = true;
-        };
-
-        webSocket.onmessage = (event) => {
-            response = event.data; // Update the response variable
-            console.log('Received:', event.data);
-        };
-
-        webSocket.onerror = (error) => {
-            console.error('WebSocket error:', error);
-            isConnected = false;
-        };
-
-        webSocket.onclose = () => {
-            console.log('WebSocket connection closed');
-            isConnected = false;
-
-            // // Attempt to reconnect after a delay
-            // setTimeout(() => {
-            //     console.log('Reconnecting...');
-            //     connectWebSocket();
-            // }, 3000); // Reconnect after 3 seconds
+            }
         }
+    }
+
+    // Initialize WebSocket connection
+    function connectWebSocket() {
+        // webSocket = new WebSocket('ws://10.0.0.233:3333');
+
+        // webSocket.onopen = () => {
+        //     console.log('WebSocket connection established');
+        //     isConnected = true;
+        // };
+
+        // webSocket.onmessage = (event) => {
+        //     response = event.data; // Update the response variable
+        //     console.log('Received:', event.data);
+        // };
+
+        // webSocket.onerror = (error) => {
+        //     console.error('WebSocket error:', error);
+        //     isConnected = false;
+        // };
+
+        // webSocket.onclose = () => {
+        //     console.log('WebSocket connection closed');
+        //     isConnected = false;
+
+        //     // // Attempt to reconnect after a delay
+        //     // setTimeout(() => {
+        //     //     console.log('Reconnecting...');
+        //     //     connectWebSocket();
+        //     // }, 3000); // Reconnect after 3 seconds
+        // }
     }
 
     onMount(connectWebSocket)
@@ -61,6 +77,7 @@
         }
     }
 
+
 </script>
 
 <style>
@@ -70,7 +87,7 @@
 
 <!-- <main class="container"> -->
 <main>
-    <TopBar menu={drawer_menu}></TopBar>
+    <TopBar title={vModel.title} leftButton={vModel.leftButton} rightButton={vModel.rightButton}></TopBar>
     <Drawer bind:this={drawer_menu}/>
 
     <div style="height: 90px;"></div>

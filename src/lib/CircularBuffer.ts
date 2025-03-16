@@ -1,12 +1,12 @@
 export class CircularBuffer {
-    private buffer: Int16Array;
+    private buffer: Uint32Array ;
     private size: number;
     private pointer: number = 0;
     private isFull: boolean = false;
 
     constructor(size: number, initialValues: number[]) {
         this.size = size;
-        this.buffer = new Int16Array(size);
+        this.buffer = new Uint32Array(size);
         if (initialValues.length > size) {
             throw new Error("Initial values exceed buffer size");
         }
@@ -25,11 +25,11 @@ export class CircularBuffer {
     }
 
     // Get the current buffer as an array
-    toArray(): Int16Array {
+    toArray(): Uint32Array {
         if (!this.isFull) {
             return this.buffer.slice(0, this.pointer);
         }
-        return new Int16Array([
+        return new Uint32Array([
             ...this.buffer.slice(this.pointer),
             ...this.buffer.slice(0, this.pointer),
         ]);
