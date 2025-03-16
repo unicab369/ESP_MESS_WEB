@@ -2,18 +2,22 @@
     import { onMount } from 'svelte';
     import uPlot from 'uplot';
     import 'uplot/dist/uPlot.min.css'; // Import uPlot's CSS
+    import { CircularBuffer } from './CircularBuffer'; // Import the CircularBuffer class
 
-    export let title = "Chart Title"
+    export let title = "Chart Title";
 
     let chartContainer: HTMLElement;
     let chart: uPlot;
 
-    // Sample data
-    const data = [
-        new Int16Array([1, 2, 3, 4, 5]), // X values (timestamps or categories)
-        new Int16Array([10, 20, 30, 40, 50]), // Y values (series 1)
-        new Int16Array([15, 25, 35, 45, 55]), // Y values (series 2)
-    ];
+    // Initialize circular buffers for X and Y data
+    const bufferSize = 20;
+    const initialXValues = Array.from({ length: bufferSize }, (_, i) => i + 1);
+    const initialY1Values = Array.from({ length: bufferSize }, () => Math.floor(Math.random() * 100));
+    const initialY2Values = Array.from({ length: bufferSize }, () => Math.floor(Math.random() * 100));
+
+    let xBuffer = new CircularBuffer(bufferSize, initialXValues);
+    let y1Buffer = new CircularBuffer(bufferSize, initialY1Values);
+    let y2Buffer = new CircularBuffer(bufferSize, initialY2Values);
 
     // Chart options
     const options = {
@@ -47,30 +51,61 @@
         ],
     };
 
+    // Function to generate a new random data point
+    const generateRandomPoint = () => Math.floor(Math.random() * 100);
+
+    // Function to update the circular buffers and chart data
+    const updateData = () => {
+        // Add new X value (increment the last X value by 1)
+        const lastX = xBuffer.toArray()[xBuffer.toArray().length - 1] || 0;
+        xBuffer.push(lastX + 1);
+
+        // Add new Y values
+        y1Buffer.push(generateRandomPoint());
+        y2Buffer.push(generateRandomPoint());
+
+        // Update the chart data
+        if (chart) {
+            chart.setData([
+                xBuffer.toArray(),
+                y1Buffer.toArray(),
+                y2Buffer.toArray(),
+            ]);
+        }
+    };
+
     // Initialize the chart when the component mounts
     onMount(() => {
         const initChart = () => {
             if (chartContainer) {
-                const containerWidth = chartContainer.offsetWidth
+                const containerWidth = chartContainer.offsetWidth;
                 options.width = containerWidth; // Set width dynamically
 
                 if (chart) {
                     chart.destroy(); // Destroy existing chart if it exists
                 }
 
-                chart = new uPlot(options, data, chartContainer)
+                chart = new uPlot(options, [], chartContainer);
             }
         };
 
         // Initialize the chart on mount
-        initChart()
+        initChart();
 
         // Handle window resize
-        const resizeObserver = new ResizeObserver(initChart)
+        const resizeObserver = new ResizeObserver(initChart);
         resizeObserver.observe(chartContainer);
 
-        // Clean up the chart when the component is destroyed
-        return () => chart.destroy()
+        // Update chart data every second
+        const interval = setInterval(() => {
+            updateData()
+        }, 600);
+
+        // Clean up the chart and interval when the component is destroyed
+        return () => {
+            clearInterval(interval);
+            chart.destroy();
+        };
     });
 </script>
 
