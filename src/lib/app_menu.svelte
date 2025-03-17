@@ -8,8 +8,13 @@
         let target = (event as PointerEvent)?.target as any
         isMenuOpen = !isMenuOpen // Toggle the modal state
 
-        if (target?.innerText == 'Link1') {
-            goto('/app_map')
+        switch (target?.innerText) {
+            case 'Link1': {
+                goto('/'); break;
+            }
+            case 'Link2': {
+                goto('/app_map'); break;
+            }
         }
     }
 </script>

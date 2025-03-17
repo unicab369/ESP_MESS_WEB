@@ -10,37 +10,43 @@
     let chart: uPlot;
 
     // Initialize circular buffers for X and Y data
-    const bufferSize = 50;
+    const bufferSize = 100;
     const initialXValues = Array.from({ length: bufferSize }, (_, i) => i + 1);
-    const initialY1Values = Array.from({ length: bufferSize }, () => Math.floor(Math.random() * 100));
-    const initialY2Values = Array.from({ length: bufferSize }, () => Math.floor(Math.random() * 100));
+    const initialY1Values = Array.from({ length: bufferSize }, () => Math.floor(Math.random() + 51));
+    const initialY2Values = Array.from({ length: bufferSize }, () => Math.floor(Math.random() + 51));
 
     let xBuffer = new CircularBuffer(bufferSize, initialXValues);
     let y1Buffer = new CircularBuffer(bufferSize, initialY1Values);
     let y2Buffer = new CircularBuffer(bufferSize, initialY2Values);
 
     // Function to generate a new random data point
-    const generateRandomPoint = () => Math.floor(Math.random() * 100);
+    const generateRandomPoint = () => Math.floor(Math.random() * 51);
 
-    // Function to update the circular buffers and chart data
-    const updateData = () => {
-        // Add new X value (increment the last X value by 1)
-        const lastX = xBuffer.toArray()[xBuffer.toArray().length - 1] || 0;
-        xBuffer.push(lastX + 1);
+    export async function updateData(value: number[], len: number) {
+        for (let i=0; i<len; i++) {
+            // Add new X value (increment the last X value by 1)
+            const lastX = xBuffer.toArray()[xBuffer.toArray().length - 1] || 0;
+            xBuffer.push(lastX + 1);
 
-        // Add new Y values
-        y1Buffer.push(generateRandomPoint());
-        y2Buffer.push(generateRandomPoint());
+            // Add new Y values
+            y1Buffer.push(value[i]);
+            // y2Buffer.push(generateRandomPoint());
 
-        // Update the chart data
-        chart?.setData([
-            xBuffer.toArray(),
-            y1Buffer.toArray(),
-            y2Buffer.toArray(),
-        ]);
-    };
+            // Update the chart data
+            chart?.setData([
+                xBuffer.toArray(),
+                y1Buffer.toArray(),
+                // y2Buffer.toArray(),
+            ]);
+
+            await new Promise(resolve => setTimeout(resolve, 30));
+        }
+
+    }
 
     // Initialize the chart when the component mounts
+    let stroke_color = '#1e1e1e'
+
     onMount(() => {
             // Chart options
         const options = {
@@ -49,29 +55,44 @@
             height: 400,
             axes: [
                 {
-                    stroke: '#63739c',
+                    label: "Time",
+                    labelSize: 14,
+                    labelFont: "bold 14px Arial",
+                    labelColor: "#FFFFFF",
+                    stroke: "#FFFFFF",
+
                     grid: {
-                        stroke: '#63739c'
+                        stroke: stroke_color
                     },
                     ticks: {
-                        stroke: '#63739c'
-                    }
+                        stroke: stroke_color
+                    },
                 },
                 {
-                    stroke: '#63739c',
+                    label: "Value",
+                    labelSize: 14,
+                    labelFont: "bold 14px Arial",
+                    labelColor: "#FFFFFF",
+                    stroke:"#FFFFFF",
+
                     grid: {
-                        stroke: '#63739c',
+                        stroke: stroke_color,
                     },
                     ticks: {
-                        stroke: '#63739c',
+                        stroke: stroke_color,
                     },
                 }
             ],
             series: [
                 { label: 'X Axis' }, // X-axis
-                { label: 'Series 1', stroke: 'red' }, // Series 1
-                { label: 'Series 2', stroke: 'blue' }, // Series 2
+                { label: 'Series 1', stroke: '#FFC300 ' }, // Series 1
+                // { label: 'Series 2', stroke: 'blue' }, // Series 2
             ],
+            scales: {
+                y: {
+                    range: (u: uPlot, initMin: number, initMax: number) => [0, 50] as [number, number]
+                }
+            }
         };
 
         const initChart = () => {
@@ -86,7 +107,7 @@
                     y2Buffer.toArray(),
                 ], chartContainer);
 
-                updateData();
+                // updateData();
             }
         };
 
@@ -97,14 +118,14 @@
         const resizeObserver = new ResizeObserver(initChart);
         resizeObserver.observe(chartContainer);
 
-        // Update chart data every second
-        const interval = setInterval(() => {
-            updateData()
-        }, 150);
+        // // Update chart data every second
+        // const interval = setInterval(() => {
+        //     updateData()
+        // }, 150);
 
         // Clean up the chart and interval when the component is destroyed
         return () => {
-            clearInterval(interval);
+            // clearInterval(interval);
             chart?.destroy();
         };
     });

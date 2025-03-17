@@ -1,8 +1,5 @@
 <script lang="ts">
     import '@picocss/pico';
-    import menuIcon from '../assets/icons/menu-icon.svg'
-    import userIcon from '../assets/icons/user-icon.svg'
-    import Drawer from '../lib/app_menu.svelte'
 
     export let title: string;
     export let leftButton: { icon: string, action: () => void };
